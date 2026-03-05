@@ -93,8 +93,9 @@ config :swoosh, :api_client, false
 
 # Ethereum endpoints (Chainstack) — replace with your real URLs
 config :periodicmonitor, :ethereum,
-  https_endpoint: "https://ethereum-mainnet.core.chainstack.com/b8ef09e92bbabf8cbee839840991d49e",
-  wss_endpoint: "wss://ethereum-mainnet.core.chainstack.com/b8ef09e92bbabf8cbee839840991d49e"
+  https_endpoint:
+    System.get_env("ETHEREUM_HTTPS_ENDPOINT", "https://your-chainstack-https-endpoint"),
+  wss_endpoint: System.get_env("ETHEREUM_WSS_ENDPOINT", "wss://your-chainstack-wss-endpoint")
 
 # ENS names to monitor
 config :periodicmonitor, :ens_names, [

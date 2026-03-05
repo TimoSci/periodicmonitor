@@ -127,7 +127,9 @@ defmodule PeriodicmonitorWeb.DomainsLive do
                     {domain.status}
                   </span>
                 </td>
-                <td class="text-sm text-base-content/60">{format_datetime(domain.last_checked_at)}</td>
+                <td class="text-sm text-base-content/60">
+                  {format_datetime(domain.last_checked_at)}
+                </td>
               </tr>
             </tbody>
           </table>
