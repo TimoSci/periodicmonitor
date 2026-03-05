@@ -43,6 +43,7 @@ config :phoenix,
 # Ethereum test config — uses Req.Test plug, no real HTTP calls
 config :periodicmonitor, :ethereum,
   https_endpoint: "https://test.example.com",
-  wss_endpoint: "wss://test.example.com"
+  wss_endpoint: "wss://test.example.com",
+  req_options: [plug: {Req.Test, Periodicmonitor.Ethereum.RPC}]
 
 config :periodicmonitor, :ens_names, ["test1.eth", "test2.eth"]
