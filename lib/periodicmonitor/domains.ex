@@ -72,6 +72,14 @@ defmodule Periodicmonitor.Domains do
 
   def check_all_domains do
     names = Application.get_env(:periodicmonitor, :ens_names, [])
+    cleanup_removed_domains(names)
     Enum.map(names, &check_domain/1)
+  end
+
+  defp cleanup_removed_domains(configured_names) do
+    import Ecto.Query
+
+    from(d in EnsDomain, where: d.name not in ^configured_names)
+    |> Repo.delete_all()
   end
 end
