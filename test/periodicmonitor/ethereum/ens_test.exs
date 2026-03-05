@@ -46,4 +46,66 @@ defmodule Periodicmonitor.Ethereum.ENSTest do
       assert ENS.token_id("urs.eth") == ENS.token_id("urs")
     end
   end
+
+  describe "name_expires/1" do
+    test "returns expiration datetime for a name" do
+      # Timestamp 1735689600 = 2025-01-01 00:00:00 UTC = 0x67748580
+      Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.send_resp(200, Jason.encode!(%{
+          "jsonrpc" => "2.0",
+          "id" => 1,
+          "result" => "0x0000000000000000000000000000000000000000000000000000000067748580"
+        }))
+      end)
+
+      assert {:ok, %DateTime{} = dt} = ENS.name_expires("urs")
+      assert dt == ~U[2025-01-01 00:00:00Z]
+    end
+
+    test "returns error when RPC fails" do
+      Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.send_resp(200, Jason.encode!(%{
+          "jsonrpc" => "2.0",
+          "id" => 1,
+          "error" => %{"code" => -32000, "message" => "execution reverted"}
+        }))
+      end)
+
+      assert {:error, "execution reverted"} = ENS.name_expires("urs")
+    end
+  end
+
+  describe "get_owner/1" do
+    test "returns owner address for a name" do
+      Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.send_resp(200, Jason.encode!(%{
+          "jsonrpc" => "2.0",
+          "id" => 1,
+          "result" => "0x000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+        }))
+      end)
+
+      assert {:ok, "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"} = ENS.get_owner("urs.eth")
+    end
+
+    test "returns error when RPC fails" do
+      Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.send_resp(200, Jason.encode!(%{
+          "jsonrpc" => "2.0",
+          "id" => 1,
+          "error" => %{"code" => -32000, "message" => "execution reverted"}
+        }))
+      end)
+
+      assert {:error, "execution reverted"} = ENS.get_owner("urs.eth")
+    end
+  end
 end
