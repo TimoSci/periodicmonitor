@@ -100,6 +100,6 @@ config :periodicmonitor, :ethereum,
 # ENS names to monitor
 config :periodicmonitor, :ens_names, [
   "urs.eth",
-  "andernatt.eth",
+  "andermatt.eth",
   "alm.eth"
 ]
