@@ -14,6 +14,11 @@ defmodule Periodicmonitor.Ethereum.RPC do
     end
   end
 
+  def eth_call(to, data) do
+    params = [%{"to" => to, "data" => data}, "latest"]
+    json_rpc("eth_call", params)
+  end
+
   defp json_rpc(method, params) do
     body = %{
       "jsonrpc" => "2.0",
