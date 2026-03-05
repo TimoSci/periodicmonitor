@@ -39,3 +39,10 @@ config :phoenix_live_view,
 # Sort query params output of verified routes for robust url comparisons
 config :phoenix,
   sort_verified_routes_query_params: true
+
+# Ethereum test config — uses Req.Test plug, no real HTTP calls
+config :periodicmonitor, :ethereum,
+  https_endpoint: "https://test.example.com",
+  wss_endpoint: "wss://test.example.com"
+
+config :periodicmonitor, :ens_names, ["test1.eth", "test2.eth"]

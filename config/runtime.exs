@@ -117,4 +117,17 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Req
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  config :periodicmonitor, :ethereum,
+    https_endpoint:
+      System.get_env("ETHEREUM_HTTPS_ENDPOINT") ||
+        raise("environment variable ETHEREUM_HTTPS_ENDPOINT is missing."),
+    wss_endpoint:
+      System.get_env("ETHEREUM_WSS_ENDPOINT") ||
+        raise("environment variable ETHEREUM_WSS_ENDPOINT is missing.")
+
+  config :periodicmonitor, :ens_names,
+    System.get_env("ENS_NAMES", "")
+    |> String.split(",", trim: true)
+    |> Enum.map(&String.trim/1)
 end

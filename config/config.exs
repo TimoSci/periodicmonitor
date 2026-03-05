@@ -11,6 +11,14 @@ config :periodicmonitor,
   ecto_repos: [Periodicmonitor.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+# Ethereum endpoint configuration
+config :periodicmonitor, :ethereum,
+  https_endpoint: "https://placeholder.example.com",
+  wss_endpoint: "wss://placeholder.example.com"
+
+# ENS names to monitor
+config :periodicmonitor, :ens_names, []
+
 # Configure the endpoint
 config :periodicmonitor, PeriodicmonitorWeb.Endpoint,
   url: [host: "localhost"],
