@@ -45,7 +45,6 @@ defmodule PeriodicmonitorWeb.DomainsLive do
       "expiring" -> "badge badge-warning"
       "critical" -> "badge badge-error animate-pulse"
       "expired" -> "badge badge-error animate-pulse"
-      "unregistered" -> "badge badge-error"
       _ -> "badge badge-ghost"
     end
   end

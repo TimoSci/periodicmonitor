@@ -64,7 +64,7 @@ defmodule Periodicmonitor.Domains do
     zero_address = "0x0000000000000000000000000000000000000000"
 
     if DateTime.compare(expires_at, ~U[1970-01-02 00:00:00Z]) == :lt and owner == zero_address do
-      {nil, "unregistered"}
+      {nil, "expired"}
     else
       {DateTime.truncate(expires_at, :second), compute_status(expires_at)}
     end
