@@ -53,6 +53,16 @@ mix ethereum.health_check
 
 This calls `eth_blockNumber` on the configured endpoint and displays the current block number.
 
+## ENS Domain Monitoring
+
+Check expiration dates for all configured ENS names:
+
+```bash
+mix ens.check_expirations
+```
+
+This queries the ENS BaseRegistrar and Registry contracts on Ethereum mainnet, retrieves expiration dates and owners, and stores results in the database.
+
 ## Development
 
 ```bash
