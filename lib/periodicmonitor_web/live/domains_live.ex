@@ -43,9 +43,9 @@ defmodule PeriodicmonitorWeb.DomainsLive do
     case status do
       "active" -> "badge badge-success"
       "expiring" -> "badge badge-warning"
-      "critical" -> "badge badge-error"
+      "critical" -> "badge badge-error animate-pulse"
       "expired" -> "badge badge-error animate-pulse"
-      "unregistered" -> "badge badge-ghost"
+      "unregistered" -> "badge badge-error"
       _ -> "badge badge-ghost"
     end
   end
