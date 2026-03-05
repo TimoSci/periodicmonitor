@@ -40,10 +40,10 @@ This is a **Phoenix/Elixir web application** that monitors ENS (Ethereum Name Se
 - [ ] Verify migrations work correctly (user will check via PGAdmin)
 
 #### Phase 5: Alerts & Web Interface
-- [ ] Define alert rules (e.g., 30 days, 7 days, expired)
-- [ ] Build Phoenix LiveView page to display monitored domains and their status
-- [ ] Show visual alerts for domains approaching expiration
-- [ ] Color-coded urgency levels (green/yellow/red)
+- [x] Define alert rules (active >30d, expiring 7-30d, critical <7d, expired)
+- [x] Build Phoenix LiveView page to display monitored domains and their status
+- [x] Show visual alerts for domains approaching expiration (pulse animation for expired)
+- [x] Color-coded urgency levels (green/yellow/red)
 
 ## Development Rules
 

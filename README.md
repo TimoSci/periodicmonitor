@@ -63,6 +63,22 @@ mix ens.check_expirations
 
 This queries the ENS BaseRegistrar and Registry contracts on Ethereum mainnet, retrieves expiration dates and owners, and stores results in the database.
 
+## Web Interface
+
+Start the server and visit [localhost:4000](http://localhost:4000):
+
+```bash
+mix phx.server
+```
+
+The dashboard displays all monitored ENS domains with color-coded status:
+- **Green** — Active (>30 days to expiration)
+- **Yellow** — Expiring (7-30 days)
+- **Red** — Critical (<7 days)
+- **Red pulsing** — Expired
+
+Use the **Refresh** button to query Ethereum and update domain data.
+
 ## Development
 
 ```bash
