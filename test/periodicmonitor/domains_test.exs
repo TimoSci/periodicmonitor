@@ -82,4 +82,21 @@ defmodule Periodicmonitor.DomainsTest do
       assert [%EnsDomain{name: "test.eth"}] = Domains.list_domains()
     end
   end
+
+  describe "upsert_domain/1 with unregistered status" do
+    test "stores unregistered domain with nil expires_at" do
+      attrs = %{
+        name: "gone.eth",
+        label_hash: "0xabc",
+        owner: "0x0000000000000000000000000000000000000000",
+        expires_at: nil,
+        status: "unregistered",
+        last_checked_at: DateTime.utc_now() |> DateTime.truncate(:second)
+      }
+
+      assert {:ok, %EnsDomain{} = domain} = Domains.upsert_domain(attrs)
+      assert domain.status == "unregistered"
+      assert domain.expires_at == nil
+    end
+  end
 end

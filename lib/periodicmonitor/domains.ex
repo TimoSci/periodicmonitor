@@ -47,14 +47,26 @@ defmodule Periodicmonitor.Domains do
 
     with {:ok, expires_at} <- ENS.name_expires(name),
          {:ok, owner} <- ENS.get_owner(name) do
+      {final_expires, status} = classify_domain(expires_at, owner)
+
       upsert_domain(%{
         name: name,
         label_hash: ENS.label_hash(name),
         owner: owner,
-        expires_at: DateTime.truncate(expires_at, :second),
-        status: compute_status(expires_at),
+        expires_at: final_expires,
+        status: status,
         last_checked_at: DateTime.utc_now() |> DateTime.truncate(:second)
       })
+    end
+  end
+
+  defp classify_domain(expires_at, owner) do
+    zero_address = "0x0000000000000000000000000000000000000000"
+
+    if DateTime.compare(expires_at, ~U[1970-01-02 00:00:00Z]) == :lt and owner == zero_address do
+      {nil, "unregistered"}
+    else
+      {DateTime.truncate(expires_at, :second), compute_status(expires_at)}
     end
   end
 

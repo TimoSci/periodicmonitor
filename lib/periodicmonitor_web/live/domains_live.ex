@@ -45,6 +45,7 @@ defmodule PeriodicmonitorWeb.DomainsLive do
       "expiring" -> "badge badge-warning"
       "critical" -> "badge badge-error"
       "expired" -> "badge badge-error animate-pulse"
+      "unregistered" -> "badge badge-ghost"
       _ -> "badge badge-ghost"
     end
   end
@@ -53,6 +54,12 @@ defmodule PeriodicmonitorWeb.DomainsLive do
 
   defp format_date(%DateTime{} = dt) do
     Calendar.strftime(dt, "%Y-%m-%d")
+  end
+
+  defp format_datetime(nil), do: "—"
+
+  defp format_datetime(%DateTime{} = dt) do
+    Calendar.strftime(dt, "%Y-%m-%d %H:%M:%S")
   end
 
   defp days_until(nil), do: "—"
@@ -121,7 +128,7 @@ defmodule PeriodicmonitorWeb.DomainsLive do
                     {domain.status}
                   </span>
                 </td>
-                <td class="text-sm text-base-content/60">{format_date(domain.last_checked_at)}</td>
+                <td class="text-sm text-base-content/60">{format_datetime(domain.last_checked_at)}</td>
               </tr>
             </tbody>
           </table>
