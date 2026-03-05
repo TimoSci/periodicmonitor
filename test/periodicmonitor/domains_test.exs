@@ -23,6 +23,11 @@ defmodule Periodicmonitor.DomainsTest do
     test "returns \"unknown\" when expires_at is nil" do
       assert Domains.compute_status(nil) == "unknown"
     end
+
+    test "returns \"critical\" when expires_at is less than 7 days away" do
+      soon = DateTime.add(DateTime.utc_now(), 3, :day)
+      assert Domains.compute_status(soon) == "critical"
+    end
   end
 
   describe "upsert_domain/1" do

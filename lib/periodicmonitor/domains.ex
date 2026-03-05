@@ -7,6 +7,7 @@ defmodule Periodicmonitor.Domains do
   alias Periodicmonitor.Domains.EnsDomain
 
   @expiring_threshold_days 30
+  @critical_threshold_days 7
 
   def list_domains do
     Repo.all(EnsDomain)
@@ -29,6 +30,9 @@ defmodule Periodicmonitor.Domains do
     cond do
       DateTime.compare(expires_at, now) == :lt ->
         "expired"
+
+      DateTime.diff(expires_at, now, :day) <= @critical_threshold_days ->
+        "critical"
 
       DateTime.diff(expires_at, now, :day) <= @expiring_threshold_days ->
         "expiring"
