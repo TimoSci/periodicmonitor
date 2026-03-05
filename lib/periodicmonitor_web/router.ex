@@ -17,7 +17,7 @@ defmodule PeriodicmonitorWeb.Router do
   scope "/", PeriodicmonitorWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", DomainsLive
   end
 
   # Other scopes may use custom stacks.
