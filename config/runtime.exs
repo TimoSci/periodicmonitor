@@ -23,6 +23,27 @@ end
 config :periodicmonitor, PeriodicmonitorWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# Allow Mailgun in dev when env vars are set (for testing email delivery)
+if config_env() == :dev and System.get_env("MAILGUN_API_KEY") do
+  config :periodicmonitor, Periodicmonitor.Mailer,
+    adapter: Swoosh.Adapters.Mailgun,
+    api_key: System.get_env("MAILGUN_API_KEY"),
+    domain: System.get_env("MAILGUN_DOMAIN"),
+    base_url: System.get_env("MAILGUN_BASE_URL", "https://api.mailgun.net/v3")
+
+  config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+  config :periodicmonitor,
+         :alert_recipients,
+         System.get_env("ALERT_RECIPIENTS", "")
+         |> String.split(",", trim: true)
+         |> Enum.map(&String.trim/1)
+
+  config :periodicmonitor,
+         :alert_from_email,
+         System.get_env("ALERT_FROM_EMAIL", "alerts@periodicmonitor.local")
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -117,4 +138,41 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Req
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  config :periodicmonitor, :ethereum,
+    https_endpoint:
+      System.get_env("ETHEREUM_HTTPS_ENDPOINT") ||
+        raise("environment variable ETHEREUM_HTTPS_ENDPOINT is missing."),
+    wss_endpoint:
+      System.get_env("ETHEREUM_WSS_ENDPOINT") ||
+        raise("environment variable ETHEREUM_WSS_ENDPOINT is missing.")
+
+  config :periodicmonitor,
+         :ens_names,
+         System.get_env("ENS_NAMES", "")
+         |> String.split(",", trim: true)
+         |> Enum.map(&String.trim/1)
+
+  # Mailgun email delivery
+  config :periodicmonitor, Periodicmonitor.Mailer,
+    adapter: Swoosh.Adapters.Mailgun,
+    api_key:
+      System.get_env("MAILGUN_API_KEY") ||
+        raise("environment variable MAILGUN_API_KEY is missing."),
+    domain:
+      System.get_env("MAILGUN_DOMAIN") ||
+        raise("environment variable MAILGUN_DOMAIN is missing."),
+    base_url: System.get_env("MAILGUN_BASE_URL", "https://api.mailgun.net/v3")
+
+  config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+  config :periodicmonitor,
+         :alert_recipients,
+         System.get_env("ALERT_RECIPIENTS", "")
+         |> String.split(",", trim: true)
+         |> Enum.map(&String.trim/1)
+
+  config :periodicmonitor,
+         :alert_from_email,
+         System.get_env("ALERT_FROM_EMAIL", "alerts@periodicmonitor.local")
 end

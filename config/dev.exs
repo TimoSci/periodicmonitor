@@ -58,12 +58,12 @@ config :periodicmonitor, PeriodicmonitorWeb.Endpoint,
     web_console_logger: true,
     patterns: [
       # Static assets, except user uploads
-      ~r"priv/static/(?!uploads/).*\.(js|css|png|jpeg|jpg|gif|svg)$"E,
+      ~r"priv/static/(?!uploads/).*\.(js|css|png|jpeg|jpg|gif|svg)$",
       # Gettext translations
-      ~r"priv/gettext/.*\.po$"E,
+      ~r"priv/gettext/.*\.po$",
       # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/periodicmonitor_web/router\.ex$"E,
-      ~r"lib/periodicmonitor_web/(controllers|live|components)/.*\.(ex|heex)$"E
+      ~r"lib/periodicmonitor_web/router\.ex$",
+      ~r"lib/periodicmonitor_web/(controllers|live|components)/.*\.(ex|heex)$"
     ]
   ]
 
@@ -90,3 +90,19 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# Ethereum endpoints (Chainstack) — replace with your real URLs
+config :periodicmonitor, :ethereum,
+  https_endpoint:
+    System.get_env("ETHEREUM_HTTPS_ENDPOINT", "https://your-chainstack-https-endpoint"),
+  wss_endpoint: System.get_env("ETHEREUM_WSS_ENDPOINT", "wss://your-chainstack-wss-endpoint")
+
+# ENS names to monitor
+config :periodicmonitor, :ens_names, [
+  "urs.eth",
+  "andermatt.eth",
+  "alm.eth"
+]
+
+# Disable notification scheduler in dev (use mix task to test manually)
+config :periodicmonitor, :start_notification_scheduler, false
