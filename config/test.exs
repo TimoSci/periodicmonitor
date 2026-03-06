@@ -47,3 +47,6 @@ config :periodicmonitor, :ethereum,
   req_options: [plug: {Req.Test, Periodicmonitor.Ethereum.RPC}]
 
 config :periodicmonitor, :ens_names, ["test1.eth", "test2.eth"]
+
+# Disable notification scheduler in tests (invoked manually)
+config :periodicmonitor, :start_notification_scheduler, false
