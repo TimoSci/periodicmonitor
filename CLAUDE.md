@@ -45,6 +45,14 @@ This is a **Phoenix/Elixir web application** that monitors ENS (Ethereum Name Se
 - [x] Show visual alerts for domains approaching expiration (pulse animation for expired)
 - [x] Color-coded urgency levels (green/yellow/red)
 
+#### Phase 6: Email Notifications
+- [x] Create notification_logs table to track sent alerts
+- [x] Build email module with Swoosh for expiration alerts
+- [x] Implement milestone detection (30d, 7d, 1d)
+- [x] Create Scheduler GenServer for daily checks
+- [x] Configure SendGrid adapter for production
+- [x] Add mix notifications.test_email task
+
 ## Development Rules
 
 ### Mandatory for Every Feature

@@ -79,6 +79,34 @@ The dashboard displays all monitored ENS domains with color-coded status:
 
 Use the **Refresh** button to query Ethereum and update domain data.
 
+## Notifications
+
+Email notifications are sent when ENS domains reach expiration milestones:
+- **30 days** before expiration
+- **7 days** before expiration
+- **1 day** before expiration
+
+### Configuration
+
+Set the following environment variables:
+
+- `SENDGRID_API_KEY` — your SendGrid API key
+- `ALERT_RECIPIENTS` — comma-separated email addresses (e.g., `user1@example.com,user2@example.com`)
+- `ALERT_FROM_EMAIL` — sender email address (default: `alerts@periodicmonitor.local`)
+
+### Testing Emails
+
+```bash
+mix notifications.test_email
+```
+
+This sends a test email to all configured recipients. Requires `ALERT_RECIPIENTS` to be set.
+
+### Environment Behavior
+
+- **Production**: The notification scheduler runs daily, sending alerts via SendGrid.
+- **Dev/Test**: The scheduler is disabled. In dev, emails go to the local Swoosh mailbox at [localhost:4000/dev/mailbox](http://localhost:4000/dev/mailbox).
+
 ## Development
 
 ```bash
