@@ -126,8 +126,27 @@ if config_env() == :prod do
       System.get_env("ETHEREUM_WSS_ENDPOINT") ||
         raise("environment variable ETHEREUM_WSS_ENDPOINT is missing.")
 
-  config :periodicmonitor, :ens_names,
-    System.get_env("ENS_NAMES", "")
+  config :periodicmonitor,
+         :ens_names,
+         System.get_env("ENS_NAMES", "")
+         |> String.split(",", trim: true)
+         |> Enum.map(&String.trim/1)
+
+  # SendGrid email delivery
+  config :periodicmonitor, Periodicmonitor.Mailer,
+    adapter: Swoosh.Adapters.Sendgrid,
+    api_key: System.get_env("SENDGRID_API_KEY") ||
+      raise("environment variable SENDGRID_API_KEY is missing.")
+
+  config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+  config :periodicmonitor,
+    :alert_recipients,
+    System.get_env("ALERT_RECIPIENTS", "")
     |> String.split(",", trim: true)
     |> Enum.map(&String.trim/1)
+
+  config :periodicmonitor,
+    :alert_from_email,
+    System.get_env("ALERT_FROM_EMAIL", "alerts@periodicmonitor.local")
 end

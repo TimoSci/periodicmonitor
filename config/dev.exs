@@ -103,3 +103,6 @@ config :periodicmonitor, :ens_names, [
   "andermatt.eth",
   "alm.eth"
 ]
+
+# Disable notification scheduler in dev (use mix task to test manually)
+config :periodicmonitor, :start_notification_scheduler, false
