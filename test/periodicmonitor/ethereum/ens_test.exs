@@ -53,11 +53,14 @@ defmodule Periodicmonitor.Ethereum.ENSTest do
       Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
         conn
         |> Plug.Conn.put_resp_content_type("application/json")
-        |> Plug.Conn.send_resp(200, Jason.encode!(%{
-          "jsonrpc" => "2.0",
-          "id" => 1,
-          "result" => "0x0000000000000000000000000000000000000000000000000000000067748580"
-        }))
+        |> Plug.Conn.send_resp(
+          200,
+          Jason.encode!(%{
+            "jsonrpc" => "2.0",
+            "id" => 1,
+            "result" => "0x0000000000000000000000000000000000000000000000000000000067748580"
+          })
+        )
       end)
 
       assert {:ok, %DateTime{} = dt} = ENS.name_expires("urs")
@@ -68,11 +71,14 @@ defmodule Periodicmonitor.Ethereum.ENSTest do
       Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
         conn
         |> Plug.Conn.put_resp_content_type("application/json")
-        |> Plug.Conn.send_resp(200, Jason.encode!(%{
-          "jsonrpc" => "2.0",
-          "id" => 1,
-          "error" => %{"code" => -32000, "message" => "execution reverted"}
-        }))
+        |> Plug.Conn.send_resp(
+          200,
+          Jason.encode!(%{
+            "jsonrpc" => "2.0",
+            "id" => 1,
+            "error" => %{"code" => -32000, "message" => "execution reverted"}
+          })
+        )
       end)
 
       assert {:error, "execution reverted"} = ENS.name_expires("urs")
@@ -84,11 +90,14 @@ defmodule Periodicmonitor.Ethereum.ENSTest do
       Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
         conn
         |> Plug.Conn.put_resp_content_type("application/json")
-        |> Plug.Conn.send_resp(200, Jason.encode!(%{
-          "jsonrpc" => "2.0",
-          "id" => 1,
-          "result" => "0x000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
-        }))
+        |> Plug.Conn.send_resp(
+          200,
+          Jason.encode!(%{
+            "jsonrpc" => "2.0",
+            "id" => 1,
+            "result" => "0x000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+          })
+        )
       end)
 
       assert {:ok, "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"} = ENS.get_owner("urs.eth")
@@ -98,11 +107,14 @@ defmodule Periodicmonitor.Ethereum.ENSTest do
       Req.Test.stub(Periodicmonitor.Ethereum.RPC, fn conn ->
         conn
         |> Plug.Conn.put_resp_content_type("application/json")
-        |> Plug.Conn.send_resp(200, Jason.encode!(%{
-          "jsonrpc" => "2.0",
-          "id" => 1,
-          "error" => %{"code" => -32000, "message" => "execution reverted"}
-        }))
+        |> Plug.Conn.send_resp(
+          200,
+          Jason.encode!(%{
+            "jsonrpc" => "2.0",
+            "id" => 1,
+            "error" => %{"code" => -32000, "message" => "execution reverted"}
+          })
+        )
       end)
 
       assert {:error, "execution reverted"} = ENS.get_owner("urs.eth")

@@ -6,22 +6,34 @@ defmodule Periodicmonitor.NotificationsTest do
 
   describe "milestone_for_domain/1" do
     test "returns \"1d\" when domain expires in 1 day" do
-      domain = %Periodicmonitor.Domains.EnsDomain{expires_at: DateTime.add(DateTime.utc_now(), 1, :day)}
+      domain = %Periodicmonitor.Domains.EnsDomain{
+        expires_at: DateTime.add(DateTime.utc_now(), 1, :day)
+      }
+
       assert Notifications.milestone_for_domain(domain) == "1d"
     end
 
     test "returns \"7d\" when domain expires in 5 days" do
-      domain = %Periodicmonitor.Domains.EnsDomain{expires_at: DateTime.add(DateTime.utc_now(), 5, :day)}
+      domain = %Periodicmonitor.Domains.EnsDomain{
+        expires_at: DateTime.add(DateTime.utc_now(), 5, :day)
+      }
+
       assert Notifications.milestone_for_domain(domain) == "7d"
     end
 
     test "returns \"30d\" when domain expires in 20 days" do
-      domain = %Periodicmonitor.Domains.EnsDomain{expires_at: DateTime.add(DateTime.utc_now(), 20, :day)}
+      domain = %Periodicmonitor.Domains.EnsDomain{
+        expires_at: DateTime.add(DateTime.utc_now(), 20, :day)
+      }
+
       assert Notifications.milestone_for_domain(domain) == "30d"
     end
 
     test "returns nil when domain expires in more than 30 days" do
-      domain = %Periodicmonitor.Domains.EnsDomain{expires_at: DateTime.add(DateTime.utc_now(), 60, :day)}
+      domain = %Periodicmonitor.Domains.EnsDomain{
+        expires_at: DateTime.add(DateTime.utc_now(), 60, :day)
+      }
+
       assert Notifications.milestone_for_domain(domain) == nil
     end
 
@@ -31,7 +43,10 @@ defmodule Periodicmonitor.NotificationsTest do
     end
 
     test "returns nil when domain is already expired" do
-      domain = %Periodicmonitor.Domains.EnsDomain{expires_at: DateTime.add(DateTime.utc_now(), -1, :day)}
+      domain = %Periodicmonitor.Domains.EnsDomain{
+        expires_at: DateTime.add(DateTime.utc_now(), -1, :day)
+      }
+
       assert Notifications.milestone_for_domain(domain) == nil
     end
   end

@@ -45,6 +45,21 @@ defmodule Periodicmonitor.Notifications.Email do
 
     You will receive alerts when your ENS domains are 30 days, 7 days, and 1 day from expiration.
 
+    Here is an example of what an alert will look like:
+
+    -------------------------------------------------------
+    This is a notification from the ENS Domain Monitor.
+
+    The domain example.eth expires in 30 days.
+
+    Details:
+      Expiration date: 2026-04-06 00:00 UTC
+      Status: expiring
+      Owner: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+
+    Please renew it to avoid losing ownership.
+    -------------------------------------------------------
+
     --
     ENS Domain Monitor
     """)

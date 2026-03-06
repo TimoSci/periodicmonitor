@@ -59,14 +59,12 @@ defmodule Periodicmonitor.Ethereum.RPCTest do
           Jason.encode!(%{
             "jsonrpc" => "2.0",
             "id" => 1,
-            "result" =>
-              "0x000000000000000000000000000000000000000000000000000000006789abcd"
+            "result" => "0x000000000000000000000000000000000000000000000000000000006789abcd"
           })
         )
       end)
 
-      assert {:ok,
-              "0x000000000000000000000000000000000000000000000000000000006789abcd"} =
+      assert {:ok, "0x000000000000000000000000000000000000000000000000000000006789abcd"} =
                Periodicmonitor.Ethereum.RPC.eth_call("0xcontract", "0xdata")
     end
 
