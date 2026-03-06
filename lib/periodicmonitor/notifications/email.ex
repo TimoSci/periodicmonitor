@@ -14,14 +14,16 @@ defmodule Periodicmonitor.Notifications.Email do
     |> from({"ENS Monitor", from_address})
     |> subject("[ENS Alert] #{domain.name} expires in #{label}")
     |> text_body("""
-    ENS Domain Expiration Alert
+    This is a notification from the ENS Domain Monitor.
 
-    Domain: #{domain.name}
-    Expires: #{Calendar.strftime(domain.expires_at, "%Y-%m-%d %H:%M UTC")}
-    Status: #{domain.status}
-    Owner: #{domain.owner}
+    The domain #{domain.name} expires in #{label}.
 
-    This domain will expire in #{label}. Please renew it to avoid losing ownership.
+    Details:
+      Expiration date: #{Calendar.strftime(domain.expires_at, "%Y-%m-%d %H:%M UTC")}
+      Status: #{domain.status}
+      Owner: #{domain.owner}
+
+    Please renew it to avoid losing ownership.
 
     --
     ENS Domain Monitor

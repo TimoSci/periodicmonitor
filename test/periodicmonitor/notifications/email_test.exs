@@ -17,7 +17,8 @@ defmodule Periodicmonitor.Notifications.EmailTest do
       assert email.subject =~ "test.eth"
       assert email.subject =~ "30 days"
       assert email.to == [{"", "user@test.com"}]
-      assert email.text_body =~ "test.eth"
+      assert email.text_body =~ "This is a notification from the ENS Domain Monitor"
+      assert email.text_body =~ "test.eth expires in 30 days"
       assert email.text_body =~ "2026-04-06"
     end
 
