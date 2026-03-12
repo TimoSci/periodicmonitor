@@ -44,6 +44,23 @@ if config_env() == :dev and System.get_env("MAILGUN_API_KEY") do
          System.get_env("ALERT_FROM_EMAIL", "alerts@periodicmonitor.local")
 end
 
+# Session Messenger config in dev when env vars are set
+if config_env() == :dev and System.get_env("SESSION_RECIPIENTS") do
+  config :periodicmonitor,
+         :session_recipients,
+         System.get_env("SESSION_RECIPIENTS", "")
+         |> String.split(",", trim: true)
+         |> Enum.map(&String.trim/1)
+
+  if url = System.get_env("SESSION_SERVICE_URL") do
+    config :periodicmonitor, :session_service_url, url
+  end
+
+  if transport = System.get_env("NOTIFICATION_TRANSPORT") do
+    config :periodicmonitor, :notification_transport, String.to_existing_atom(transport)
+  end
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -153,7 +170,7 @@ if config_env() == :prod do
          |> String.split(",", trim: true)
          |> Enum.map(&String.trim/1)
 
-  # Mailgun email delivery
+  # Mailgun email delivery (fallback transport)
   config :periodicmonitor, Periodicmonitor.Mailer,
     adapter: Swoosh.Adapters.Mailgun,
     api_key:
@@ -175,4 +192,19 @@ if config_env() == :prod do
   config :periodicmonitor,
          :alert_from_email,
          System.get_env("ALERT_FROM_EMAIL", "alerts@periodicmonitor.local")
+
+  # Session Messenger
+  config :periodicmonitor,
+         :session_recipients,
+         System.get_env("SESSION_RECIPIENTS", "")
+         |> String.split(",", trim: true)
+         |> Enum.map(&String.trim/1)
+
+  if url = System.get_env("SESSION_SERVICE_URL") do
+    config :periodicmonitor, :session_service_url, url
+  end
+
+  config :periodicmonitor,
+         :notification_transport,
+         System.get_env("NOTIFICATION_TRANSPORT", "session") |> String.to_existing_atom()
 end

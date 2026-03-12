@@ -72,6 +72,13 @@ config :phoenix, :json_library, Jason
 config :periodicmonitor, :alert_recipients, []
 config :periodicmonitor, :alert_from_email, "alerts@periodicmonitor.local"
 
+# Notification transport: :session (default) or :email (fallback)
+config :periodicmonitor, :notification_transport, :session
+
+# Session Messenger settings
+config :periodicmonitor, :session_recipients, []
+config :periodicmonitor, :session_service_url, "http://localhost:3100"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
