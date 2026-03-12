@@ -131,19 +131,35 @@ mix setup          # Install deps, create DB, run migrations, setup assets
 
 # Session service (one-time)
 cd session_service && bun install && cd ..
+
+# Create private config (required — endpoints, ENS names, Session IDs)
+cp config/private.exs.example config/private.exs
+# Then edit config/private.exs with your actual values
 ```
 
 ## Configuration
 
+### Private Config (required)
+
+Copy the template and fill in your values:
+
+```bash
+cp config/private.exs.example config/private.exs
+```
+
+This file contains your Chainstack endpoints, ENS names to monitor, and Session recipient IDs. It is **gitignored** — each developer must create their own.
+
 ### Ethereum Endpoints
 
-Configure your Chainstack HTTPS and WSS endpoints in `config/dev.exs`:
+Configure your Chainstack HTTPS and WSS endpoints in `config/private.exs`:
 
 ```elixir
 config :periodicmonitor, :ethereum,
-  https_endpoint: "https://your-chainstack-https-endpoint",
-  wss_endpoint: "wss://your-chainstack-wss-endpoint"
+  https_endpoint: "https://ethereum-mainnet.core.chainstack.com/YOUR_KEY",
+  wss_endpoint: "wss://ethereum-mainnet.core.chainstack.com/YOUR_KEY"
 ```
+
+**Important:** The HTTPS endpoint must NOT include `/beacon/` — that is the Beacon Chain API, not JSON-RPC.
 
 For production, set environment variables:
 
@@ -152,7 +168,7 @@ For production, set environment variables:
 
 ### ENS Names
 
-Configure the list of ENS names to monitor in `config/dev.exs`:
+Configure the list of ENS names to monitor in `config/private.exs`:
 
 ```elixir
 config :periodicmonitor, :ens_names, [
