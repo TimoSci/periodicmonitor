@@ -11,11 +11,14 @@ defmodule Periodicmonitor.Notifications.SessionTransportTest do
 
       conn
       |> Plug.Conn.put_resp_content_type("application/json")
-      |> Plug.Conn.send_resp(200, Jason.encode!(%{
-        status: "sent",
-        message_hash: "abc123",
-        timestamp: System.system_time(:millisecond)
-      }))
+      |> Plug.Conn.send_resp(
+        200,
+        Jason.encode!(%{
+          status: "sent",
+          message_hash: "abc123",
+          timestamp: System.system_time(:millisecond)
+        })
+      )
     end)
 
     :ok

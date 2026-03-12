@@ -12,7 +12,10 @@ defmodule Periodicmonitor.Notifications.SchedulerTest do
     Req.Test.stub(Periodicmonitor.Notifications.SessionTransport, fn conn ->
       conn
       |> Plug.Conn.put_resp_content_type("application/json")
-      |> Plug.Conn.send_resp(200, Jason.encode!(%{status: "sent", message_hash: "abc", timestamp: 0}))
+      |> Plug.Conn.send_resp(
+        200,
+        Jason.encode!(%{status: "sent", message_hash: "abc", timestamp: 0})
+      )
     end)
 
     :ok

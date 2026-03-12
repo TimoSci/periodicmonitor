@@ -81,31 +81,64 @@ Use the **Refresh** button to query Ethereum and update domain data.
 
 ## Notifications
 
-Email notifications are sent when ENS domains reach expiration milestones:
+Notifications are sent when ENS domains reach expiration milestones:
 - **30 days** before expiration
 - **7 days** before expiration
 - **1 day** before expiration
 
-### Configuration
+### Session Messenger (default)
 
-Set the following environment variables:
+Notifications are sent via Session Messenger through a Bun microservice.
 
-- `SENDGRID_API_KEY` — your SendGrid API key
-- `ALERT_RECIPIENTS` — comma-separated email addresses (e.g., `user1@example.com,user2@example.com`)
-- `ALERT_FROM_EMAIL` — sender email address (default: `alerts@periodicmonitor.local`)
+**Prerequisites:**
+- Install [Bun](https://bun.sh): `curl -fsSL https://bun.sh/install | bash`
 
-### Testing Emails
+**Setup:**
+
+```bash
+# Install Session service dependencies
+cd session_service && bun install && cd ..
+
+# Start the Session service (generates a bot mnemonic on first run)
+cd session_service && bun run index.ts
+
+# Generate a mnemonic for the bot (from another terminal)
+curl http://localhost:3100/generate-mnemonic
+```
+
+**Configuration (environment variables):**
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SESSION_BOT_MNEMONIC` | Yes | — | 13-word Session seed phrase for the bot |
+| `SESSION_DISPLAY_NAME` | No | `ENS Monitor Bot` | Bot display name |
+| `SESSION_RECIPIENTS` | Yes | — | Comma-separated Session IDs |
+| `SESSION_SERVICE_URL` | No | `http://localhost:3100` | Microservice URL |
+| `NOTIFICATION_TRANSPORT` | No | `session` | `session` or `email` |
+
+**Testing:**
+
+```bash
+mix notifications.test_session
+```
+
+### Email (fallback)
+
+To switch back to email notifications, set `NOTIFICATION_TRANSPORT=email` and configure:
+
+- `MAILGUN_API_KEY` — Mailgun API key
+- `MAILGUN_DOMAIN` — Mailgun domain
+- `ALERT_RECIPIENTS` — comma-separated email addresses
+- `ALERT_FROM_EMAIL` — sender email (default: `alerts@periodicmonitor.local`)
 
 ```bash
 mix notifications.test_email
 ```
 
-This sends a test email to all configured recipients. Requires `ALERT_RECIPIENTS` to be set.
-
 ### Environment Behavior
 
-- **Production**: The notification scheduler runs daily, sending alerts via SendGrid.
-- **Dev/Test**: The scheduler is disabled. In dev, emails go to the local Swoosh mailbox at [localhost:4000/dev/mailbox](http://localhost:4000/dev/mailbox).
+- **Production**: The notification scheduler runs daily via the configured transport.
+- **Dev/Test**: The scheduler is disabled. Use mix tasks to test manually.
 
 ## Development
 
