@@ -91,18 +91,11 @@ config :phoenix_live_view,
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
-# Ethereum endpoints (Chainstack) — replace with your real URLs
-config :periodicmonitor, :ethereum,
-  https_endpoint:
-    System.get_env("ETHEREUM_HTTPS_ENDPOINT", "https://your-chainstack-https-endpoint"),
-  wss_endpoint: System.get_env("ETHEREUM_WSS_ENDPOINT", "wss://your-chainstack-wss-endpoint")
-
-# ENS names to monitor
-config :periodicmonitor, :ens_names, [
-  "urs.eth",
-  "andermatt.eth",
-  "alm.eth"
-]
-
 # Disable notification scheduler in dev (use mix task to test manually)
 config :periodicmonitor, :start_notification_scheduler, false
+
+# Import private configuration (endpoints, ENS names, etc.)
+# Copy config/private.exs.example to config/private.exs and fill in your values.
+if File.exists?(Path.expand("private.exs", __DIR__)) do
+  import_config "private.exs"
+end

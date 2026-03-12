@@ -38,3 +38,6 @@ npm-debug.log
 # Environment variables with secrets
 .env
 
+# Private configuration (endpoints, ENS names, etc.)
+/config/private.exs
+
