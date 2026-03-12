@@ -50,3 +50,11 @@ config :periodicmonitor, :ens_names, ["test1.eth", "test2.eth"]
 
 # Disable notification scheduler in tests (invoked manually)
 config :periodicmonitor, :start_notification_scheduler, false
+
+# Session transport test config — uses Req.Test plug, no real HTTP calls
+config :periodicmonitor, :session_transport_req_options,
+  plug: {Req.Test, Periodicmonitor.Notifications.SessionTransport}
+
+config :periodicmonitor, :notification_transport, :session
+config :periodicmonitor, :session_recipients, ["05test_session_id_1", "05test_session_id_2"]
+config :periodicmonitor, :session_service_url, "http://localhost:3100"
