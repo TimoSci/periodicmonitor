@@ -41,3 +41,8 @@ npm-debug.log
 # Private configuration (endpoints, ENS names, etc.)
 /config/private.exs
 
+# Session microservice
+session_service/node_modules/
+session_service/.env
+session_service/bun.lockb
+

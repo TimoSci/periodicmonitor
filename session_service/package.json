@@ -1,0 +1,7 @@
+{
+  "name": "session-service",
+  "version": "1.0.0",
+  "dependencies": {
+    "@session.js/client": "latest"
+  }
+}
