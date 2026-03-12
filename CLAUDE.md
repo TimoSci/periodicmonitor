@@ -53,6 +53,23 @@ This is a **Phoenix/Elixir web application** that monitors ENS (Ethereum Name Se
 - [x] Configure SendGrid adapter for production
 - [x] Add mix notifications.test_email task
 
+#### Phase 7: Session Messenger Notifications
+- [x] Create Bun microservice (`session_service/`) wrapping Session.js
+- [x] Create Transport behaviour with SessionTransport and EmailTransport implementations
+- [x] Switch default notification transport from email to Session Messenger
+- [x] Keep email as dormant fallback (switchable via `NOTIFICATION_TRANSPORT=email`)
+- [x] Add `mix notifications.test_session` task
+- [x] Configure macOS LaunchAgents for auto-start on login
+
+## Services & Ports
+
+| Service | Port | LaunchAgent |
+|---------|------|-------------|
+| Session Bot | 3100 | `com.periodicmonitor.session-service` |
+| Periodicmonitor | 4000 | `com.periodicmonitor.phoenix` |
+
+All services run automatically via macOS launchd (RunAtLoad + KeepAlive). No terminal needed.
+
 ## Development Rules
 
 ### Mandatory for Every Feature
@@ -111,4 +128,6 @@ mix precommit      # Full check: compile (warnings-as-errors), format, test
 
 ## Next Immediate Task
 
-**Phase 3**: Create configuration files for Chainstack endpoints (HTTPS + WSS) and ENS name list, then build diagnostic tools to verify the Ethereum connection is working.
+All core phases complete. Potential future work:
+- Build WSS health check diagnostic (deferred)
+- Verify migrations via PGAdmin

@@ -1,12 +1,56 @@
 # Periodicmonitor
 
-ENS (Ethereum Name Service) domain expiration monitor. Connects to Ethereum via Chainstack to track domain expiration dates and alert before they expire.
+ENS (Ethereum Name Service) domain expiration monitor. Connects to Ethereum via Chainstack to track domain expiration dates and alert before they expire. Sends alerts via Session Messenger when domains approach expiration.
 
-## Setup
+**Running at:** http://localhost:4000
+
+## How Monitoring Works
+
+The app runs a **Scheduler GenServer** that checks all monitored ENS domains once every 24 hours:
+
+1. The scheduler queries the Ethereum blockchain via Chainstack to get each domain's expiration date
+2. For each domain, it calculates which milestone applies:
+   - **30 days** before expiration
+   - **7 days** before expiration
+   - **1 day** before expiration
+3. If a domain hits a milestone that hasn't been notified yet, it sends a Session message to all configured recipients
+4. The notification is logged to prevent duplicates (each domain/milestone pair is only notified once)
+
+You can also manually check expirations and refresh data via the **Refresh** button on the web dashboard.
+
+## Running as a Service (macOS)
+
+The app is configured as a **macOS LaunchAgent** — it starts automatically when you log in and restarts if it crashes. No terminal needed.
+
+| Service | Port | LaunchAgent |
+|---------|------|-------------|
+| Session Bot | 3100 | `com.periodicmonitor.session-service` |
+| Periodicmonitor | 4000 | `com.periodicmonitor.phoenix` |
+
+**Logs:** `~/Library/Logs/periodicmonitor.log` and `~/Library/Logs/session-service.log`
+
+**Useful commands:**
+
+```bash
+# Check if running
+curl http://localhost:3100/health    # Session bot
+curl -s -o /dev/null -w "%{http_code}" http://localhost:4000  # Phoenix
+
+# Restart a service
+launchctl unload ~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist
+launchctl load ~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist
+
+# View logs
+tail -f ~/Library/Logs/periodicmonitor.log
+```
+
+## Initial Setup
 
 ```bash
 mix setup          # Install deps, create DB, run migrations, setup assets
-mix phx.server     # Start server at localhost:4000
+
+# Session service (one-time)
+cd session_service && bun install && cd ..
 ```
 
 ## Configuration
