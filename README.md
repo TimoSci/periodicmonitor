@@ -29,6 +29,86 @@ The app is configured as a **macOS LaunchAgent** — it starts automatically whe
 
 **Logs:** `~/Library/Logs/periodicmonitor.log` and `~/Library/Logs/session-service.log`
 
+**Setting up the LaunchAgents:**
+
+Create `~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.periodicmonitor.phoenix</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/YOUR_USER/.asdf/shims/mix</string>
+        <string>phx.server</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/path/to/periodicmonitor</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/periodicmonitor.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/periodicmonitor.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/YOUR_USER/.asdf/shims:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/YOUR_USER</string>
+        <key>MIX_ENV</key>
+        <string>dev</string>
+    </dict>
+</dict>
+</plist>
+```
+
+Create `~/Library/LaunchAgents/com.periodicmonitor.session-service.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.periodicmonitor.session-service</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/YOUR_USER/.bun/bin/bun</string>
+        <string>run</string>
+        <string>index.ts</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/path/to/periodicmonitor/session_service</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/session-service.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/session-service.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/YOUR_USER/.bun/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
+```
+
+Replace `YOUR_USER` with your macOS username and `/path/to/periodicmonitor` with the actual project path. Then load the services:
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.periodicmonitor.session-service.plist
+launchctl load ~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist
+```
+
 **Useful commands:**
 
 ```bash
