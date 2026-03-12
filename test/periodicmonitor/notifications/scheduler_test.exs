@@ -6,8 +6,16 @@ defmodule Periodicmonitor.Notifications.SchedulerTest do
   alias Periodicmonitor.Domains
 
   setup do
-    Application.put_env(:periodicmonitor, :alert_recipients, ["test@example.com"])
-    on_exit(fn -> Application.put_env(:periodicmonitor, :alert_recipients, []) end)
+    Application.put_env(:periodicmonitor, :session_recipients, ["05test_session_id"])
+    on_exit(fn -> Application.put_env(:periodicmonitor, :session_recipients, []) end)
+
+    Req.Test.stub(Periodicmonitor.Notifications.SessionTransport, fn conn ->
+      conn
+      |> Plug.Conn.put_resp_content_type("application/json")
+      |> Plug.Conn.send_resp(200, Jason.encode!(%{status: "sent", message_hash: "abc", timestamp: 0}))
+    end)
+
+    :ok
   end
 
   describe "check_and_notify/0" do

@@ -25,13 +25,18 @@ defmodule Periodicmonitor.Notifications.Scheduler do
 
   def check_and_notify do
     alias Periodicmonitor.{Domains, Notifications}
-    alias Periodicmonitor.Notifications.Email
-    alias Periodicmonitor.Mailer
+    alias Periodicmonitor.Notifications.Transport
 
-    recipients = Application.get_env(:periodicmonitor, :alert_recipients, [])
+    transport = Transport.current()
+
+    recipients =
+      case Application.get_env(:periodicmonitor, :notification_transport, :session) do
+        :session -> Application.get_env(:periodicmonitor, :session_recipients, [])
+        :email -> Application.get_env(:periodicmonitor, :alert_recipients, [])
+      end
 
     if recipients == [] do
-      Logger.warning("[Notifications.Scheduler] No alert recipients configured, skipping.")
+      Logger.warning("[Notifications.Scheduler] No recipients configured, skipping.")
       :ok
     else
       Domains.list_domains()
@@ -42,10 +47,8 @@ defmodule Periodicmonitor.Notifications.Scheduler do
 
           milestone ->
             unless Notifications.already_notified?(domain.name, milestone) do
-              email = Email.expiration_alert(domain, milestone, recipients)
-
-              case Mailer.deliver(email) do
-                {:ok, _} ->
+              case transport.send_alert(domain, milestone, recipients) do
+                :ok ->
                   Notifications.record_notification!(domain.name, milestone)
 
                   Logger.info(
