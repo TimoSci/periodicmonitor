@@ -13,3 +13,9 @@ config :periodicmonitor, :ens_names, [
   "example1.eth",
   "example2.eth"
 ]
+
+# Session Messenger recipients (Session IDs)
+config :periodicmonitor, :session_recipients, [
+  "05your_session_id_here",
+  "05partner_session_id_here"
+]

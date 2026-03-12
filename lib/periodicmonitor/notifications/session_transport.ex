@@ -47,7 +47,7 @@ defmodule Periodicmonitor.Notifications.SessionTransport do
           Application.get_env(:periodicmonitor, :session_service_url, "http://localhost:3100")
 
         req =
-          Req.new(url: "#{base_url}/send", receive_timeout: 10_000)
+          Req.new(url: "#{base_url}/send", receive_timeout: 60_000)
           |> attach_test_plug()
 
         case Req.post(req, json: %{to: recipient, text: text}) do
