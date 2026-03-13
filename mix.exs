@@ -59,13 +59,15 @@ defmodule Periodicmonitor.MixProject do
        compile: false,
        depth: 1},
       {:swoosh, "~> 1.16"},
+      {:multipart, "~> 0.4"},
       {:req, "~> 0.5"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:ex_keccak, "~> 0.7.8"}
     ]
   end
 

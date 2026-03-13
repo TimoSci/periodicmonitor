@@ -35,3 +35,13 @@ periodicmonitor-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Environment variables with secrets
+.env
+
+# Private configuration (endpoints, ENS names, etc.)
+/config/private.exs
+
+# Session microservice
+session_service/node_modules/
+session_service/.env
+

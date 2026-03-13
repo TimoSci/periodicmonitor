@@ -7,16 +7,20 @@ defmodule Periodicmonitor.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      PeriodicmonitorWeb.Telemetry,
-      Periodicmonitor.Repo,
-      {DNSCluster, query: Application.get_env(:periodicmonitor, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Periodicmonitor.PubSub},
-      # Start a worker by calling: Periodicmonitor.Worker.start_link(arg)
-      # {Periodicmonitor.Worker, arg},
-      # Start to serve requests, typically the last entry
-      PeriodicmonitorWeb.Endpoint
-    ]
+    children =
+      [
+        PeriodicmonitorWeb.Telemetry,
+        Periodicmonitor.Repo,
+        {DNSCluster, query: Application.get_env(:periodicmonitor, :dns_cluster_query) || :ignore},
+        {Phoenix.PubSub, name: Periodicmonitor.PubSub},
+        # Start to serve requests, typically the last entry
+        PeriodicmonitorWeb.Endpoint
+      ] ++
+        if Application.get_env(:periodicmonitor, :start_notification_scheduler, true) do
+          [Periodicmonitor.Notifications.Scheduler]
+        else
+          []
+        end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

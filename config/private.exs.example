@@ -1,0 +1,21 @@
+# Private configuration — copy this file to config/private.exs and fill in your values.
+# config/private.exs is excluded from version control.
+
+import Config
+
+# Ethereum endpoints (Chainstack)
+config :periodicmonitor, :ethereum,
+  https_endpoint: "https://your-chainstack-https-endpoint",
+  wss_endpoint: "wss://your-chainstack-wss-endpoint"
+
+# ENS names to monitor
+config :periodicmonitor, :ens_names, [
+  "example1.eth",
+  "example2.eth"
+]
+
+# Session Messenger recipients (Session IDs)
+config :periodicmonitor, :session_recipients, [
+  "05your_session_id_here",
+  "05partner_session_id_here"
+]

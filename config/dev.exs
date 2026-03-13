@@ -58,12 +58,12 @@ config :periodicmonitor, PeriodicmonitorWeb.Endpoint,
     web_console_logger: true,
     patterns: [
       # Static assets, except user uploads
-      ~r"priv/static/(?!uploads/).*\.(js|css|png|jpeg|jpg|gif|svg)$"E,
+      ~r"priv/static/(?!uploads/).*\.(js|css|png|jpeg|jpg|gif|svg)$",
       # Gettext translations
-      ~r"priv/gettext/.*\.po$"E,
+      ~r"priv/gettext/.*\.po$",
       # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/periodicmonitor_web/router\.ex$"E,
-      ~r"lib/periodicmonitor_web/(controllers|live|components)/.*\.(ex|heex)$"E
+      ~r"lib/periodicmonitor_web/router\.ex$",
+      ~r"lib/periodicmonitor_web/(controllers|live|components)/.*\.(ex|heex)$"
     ]
   ]
 
@@ -90,3 +90,12 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# Disable notification scheduler in dev (use mix task to test manually)
+config :periodicmonitor, :start_notification_scheduler, false
+
+# Import private configuration (endpoints, ENS names, etc.)
+# Copy config/private.exs.example to config/private.exs and fill in your values.
+if File.exists?(Path.expand("private.exs", __DIR__)) do
+  import_config "private.exs"
+end

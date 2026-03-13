@@ -1,18 +1,288 @@
 # Periodicmonitor
 
-To start your Phoenix server:
+ENS (Ethereum Name Service) domain expiration monitor. Connects to Ethereum via Chainstack to track domain expiration dates and alert before they expire. Sends alerts via Session Messenger when domains approach expiration.
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+**Running at:** http://localhost:4000
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## How Monitoring Works
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+The app runs a **Scheduler GenServer** that checks all monitored ENS domains once every 24 hours:
 
-## Learn more
+1. The scheduler queries the Ethereum blockchain via Chainstack to get each domain's expiration date
+2. For each domain, it calculates which milestone applies:
+   - **30 days** before expiration
+   - **7 days** before expiration
+   - **1 day** before expiration
+3. If a domain hits a milestone that hasn't been notified yet, it sends a Session message to all configured recipients
+4. The notification is logged to prevent duplicates (each domain/milestone pair is only notified once)
 
-* Official website: https://www.phoenixframework.org/
-* Guides: https://hexdocs.pm/phoenix/overview.html
-* Docs: https://hexdocs.pm/phoenix
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+You can also manually check expirations and refresh data via the **Refresh** button on the web dashboard.
+
+## Running as a Service (macOS)
+
+The app is configured as a **macOS LaunchAgent** — it starts automatically when you log in and restarts if it crashes. No terminal needed.
+
+| Service | Port | LaunchAgent |
+|---------|------|-------------|
+| Session Bot | 3100 | `com.periodicmonitor.session-service` |
+| Periodicmonitor | 4000 | `com.periodicmonitor.phoenix` |
+
+**Logs:** `~/Library/Logs/periodicmonitor.log` and `~/Library/Logs/session-service.log`
+
+**Setting up the LaunchAgents:**
+
+Create `~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.periodicmonitor.phoenix</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/YOUR_USER/.asdf/shims/mix</string>
+        <string>phx.server</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/path/to/periodicmonitor</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/periodicmonitor.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/periodicmonitor.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/YOUR_USER/.asdf/shims:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/YOUR_USER</string>
+        <key>MIX_ENV</key>
+        <string>dev</string>
+    </dict>
+</dict>
+</plist>
+```
+
+Create `~/Library/LaunchAgents/com.periodicmonitor.session-service.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.periodicmonitor.session-service</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/YOUR_USER/.bun/bin/bun</string>
+        <string>run</string>
+        <string>index.ts</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/path/to/periodicmonitor/session_service</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/session-service.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOUR_USER/Library/Logs/session-service.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/YOUR_USER/.bun/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
+```
+
+Replace `YOUR_USER` with your macOS username and `/path/to/periodicmonitor` with the actual project path. Then load the services:
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.periodicmonitor.session-service.plist
+launchctl load ~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist
+```
+
+**Useful commands:**
+
+```bash
+# Check if running
+curl http://localhost:3100/health    # Session bot
+curl -s -o /dev/null -w "%{http_code}" http://localhost:4000  # Phoenix
+
+# Restart a service
+launchctl unload ~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist
+launchctl load ~/Library/LaunchAgents/com.periodicmonitor.phoenix.plist
+
+# View logs
+tail -f ~/Library/Logs/periodicmonitor.log
+```
+
+## Initial Setup
+
+```bash
+mix setup          # Install deps, create DB, run migrations, setup assets
+
+# Session service (one-time)
+cd session_service && bun install && cd ..
+
+# Create private config (required — endpoints, ENS names, Session IDs)
+cp config/private.exs.example config/private.exs
+# Then edit config/private.exs with your actual values
+```
+
+## Configuration
+
+### Private Config (required)
+
+Copy the template and fill in your values:
+
+```bash
+cp config/private.exs.example config/private.exs
+```
+
+This file contains your Chainstack endpoints, ENS names to monitor, and Session recipient IDs. It is **gitignored** — each developer must create their own.
+
+### Ethereum Endpoints
+
+Configure your Chainstack HTTPS and WSS endpoints in `config/private.exs`:
+
+```elixir
+config :periodicmonitor, :ethereum,
+  https_endpoint: "https://ethereum-mainnet.core.chainstack.com/YOUR_KEY",
+  wss_endpoint: "wss://ethereum-mainnet.core.chainstack.com/YOUR_KEY"
+```
+
+**Important:** The HTTPS endpoint must NOT include `/beacon/` — that is the Beacon Chain API, not JSON-RPC.
+
+For production, set environment variables:
+
+- `ETHEREUM_HTTPS_ENDPOINT` — Chainstack HTTPS URL
+- `ETHEREUM_WSS_ENDPOINT` — Chainstack WSS URL
+
+### ENS Names
+
+Configure the list of ENS names to monitor in `config/private.exs`:
+
+```elixir
+config :periodicmonitor, :ens_names, [
+  "name1.eth",
+  "name2.eth"
+]
+```
+
+For production, set the `ENS_NAMES` environment variable (comma-separated):
+
+```bash
+ENS_NAMES="name1.eth,name2.eth" mix phx.server
+```
+
+## Diagnostics
+
+Test your Ethereum HTTPS connection:
+
+```bash
+mix ethereum.health_check
+```
+
+This calls `eth_blockNumber` on the configured endpoint and displays the current block number.
+
+## ENS Domain Monitoring
+
+Check expiration dates for all configured ENS names:
+
+```bash
+mix ens.check_expirations
+```
+
+This queries the ENS BaseRegistrar and Registry contracts on Ethereum mainnet, retrieves expiration dates and owners, and stores results in the database.
+
+## Web Interface
+
+Start the server and visit [localhost:4000](http://localhost:4000):
+
+```bash
+mix phx.server
+```
+
+The dashboard displays all monitored ENS domains with color-coded status:
+- **Green** — Active (>30 days to expiration)
+- **Yellow** — Expiring (7-30 days)
+- **Red** — Critical (<7 days)
+- **Red pulsing** — Expired
+
+Use the **Refresh** button to query Ethereum and update domain data.
+
+## Notifications
+
+Notifications are sent when ENS domains reach expiration milestones:
+- **30 days** before expiration
+- **7 days** before expiration
+- **1 day** before expiration
+
+### Session Messenger (default)
+
+Notifications are sent via Session Messenger through a Bun microservice.
+
+**Prerequisites:**
+- Install [Bun](https://bun.sh): `curl -fsSL https://bun.sh/install | bash`
+
+**Setup:**
+
+```bash
+# Install Session service dependencies
+cd session_service && bun install && cd ..
+
+# Start the Session service (generates a bot mnemonic on first run)
+cd session_service && bun run index.ts
+
+# Generate a mnemonic for the bot (from another terminal)
+curl http://localhost:3100/generate-mnemonic
+```
+
+**Configuration (environment variables):**
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SESSION_BOT_MNEMONIC` | Yes | — | 13-word Session seed phrase for the bot |
+| `SESSION_DISPLAY_NAME` | No | `ENS Monitor Bot` | Bot display name |
+| `SESSION_RECIPIENTS` | Yes | — | Comma-separated Session IDs |
+| `SESSION_SERVICE_URL` | No | `http://localhost:3100` | Microservice URL |
+| `NOTIFICATION_TRANSPORT` | No | `session` | `session` or `email` |
+
+**Testing:**
+
+```bash
+mix notifications.test_session
+```
+
+### Email (fallback)
+
+To switch back to email notifications, set `NOTIFICATION_TRANSPORT=email` and configure:
+
+- `MAILGUN_API_KEY` — Mailgun API key
+- `MAILGUN_DOMAIN` — Mailgun domain
+- `ALERT_RECIPIENTS` — comma-separated email addresses
+- `ALERT_FROM_EMAIL` — sender email (default: `alerts@periodicmonitor.local`)
+
+```bash
+mix notifications.test_email
+```
+
+### Environment Behavior
+
+- **Production**: The notification scheduler runs daily via the configured transport.
+- **Dev/Test**: The scheduler is disabled. Use mix tasks to test manually.
+
+## Development
+
+```bash
+mix test           # Run tests
+mix precommit      # Full check: compile (warnings-as-errors), format, test
+```
